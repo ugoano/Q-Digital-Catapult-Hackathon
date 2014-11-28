@@ -1,5 +1,7 @@
 from urllib import FancyURLopener, urlopen
 from BeautifulSoup import BeautifulSoup
+import logging
+import traceback
 
 
 class MyURLopener(FancyURLopener):
@@ -12,18 +14,26 @@ def find_profile(name):
     url = "http://search.yahoo.com/search?p=" + search_term
     print "Searching url " + url
     # yraw = MyURLopener().open(url)
-    yraw = urlopen(url)
-    ysoup = BeautifulSoup(yraw.read())
-    yres = ysoup.find('div', attrs={'id': 'web'}).findAll('h3')
-    profile_link = yres[0].find('a')['href']
-    print profile_link
-    lraw = MyURLopener().open(profile_link.replace("http", "https"))
-    lsoup = BeautifulSoup(lraw.read())
-    print "Interests:"
-    for res in lsoup.findAll('span', attrs={'class': 'endorse-item-name-text'}):
-        print res.text
+    try:
+        yraw = urlopen(url)
+        ysoup = BeautifulSoup(yraw.read())
+        yres = ysoup.find('div', attrs={'id': 'web'}).findAll('h3')
+        profile_link = yres[0].find('a')['href']
+        logging.info("Profile link: " + profile_link)
+
+        skills = []
+        lraw = MyURLopener().open(profile_link)
+        lsoup = BeautifulSoup(lraw.read())
+        logging.info("Gathering skills:")
+        for res in lsoup.findAll('span', attrs={'class': 'endorse-item-name-text'}):
+            logging.info(res.text)
+            skills.append(res.text)
+        return skills
+    except:
+        logging.error(traceback.format_exc())
+        return None
 
 
 # find_profile("Ugo Anomelechi")
 # find_profile("Luke Dacey Digital Catapult")
-find_profile("Jonathan Chevallier Oxehealth")
+# find_profile("Jonathan Chevallier Oxehealth")
