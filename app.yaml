@@ -1,0 +1,22 @@
+application: q-catapult
+version: 3
+runtime: python27
+api_version: 1
+threadsafe: true
+
+builtins:
+- remote_api: on
+
+handlers:
+- url: /images
+  static_dir: images
+
+- url: /css
+  static_dir: css
+
+- url: /js
+  static_dir: js
+
+- url: .*
+  script: main.application
+  secure: always
